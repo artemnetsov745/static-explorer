@@ -6,7 +6,7 @@ from utils.filemanager import RemoveSpecSymbols
 
 def get_content_hash(file_content, hash_algorithm="sha3_256"):
     '''
-    The function of calculating the hash of a file by its contents.
+    The function for calculating the hash of a file by its contents.
 
     :param file_content: File content
     :param hash_algorithm: Hash algorithm, by default is sha3_256

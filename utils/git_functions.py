@@ -1,15 +1,31 @@
 import subprocess
 
 
-def get_commits(repo_url, repo_dir, target_dir):
-    """Функция частичного клонирования репозитория и получения списка коммитов для целевой директории"""
+def clone_repository(repo_url, repo_dir):
+    '''
+    Clone git repository to local directory.
+
+    :param repo_url: Git repository URL
+    :param repo_dir: Path to local folder for cloning git repository
+    '''
+
     try:
-        # Клонирование репозитория
+        # Cloning git repository to local directory
         subprocess.run(
             ["git", "clone", "--filter=blob:none", "--no-checkout", repo_url, repo_dir],
             check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
         )
 
+        # Disabling automatic data cleaning
+        subprocess.run(["git", "config", "gc.auto", "0"], cwd=repo_dir, check=True)
+
+    except subprocess.CalledProcessError as error:
+        print(f"Ошибка при клонировании: {error}")
+
+
+def get_commits(repo_dir, target_dir):
+    """Функция частичного клонирования репозитория и получения списка коммитов для целевой директории"""
+    try:
         # Получение списка коммитов для целевой директории
         commits_output = subprocess.run(
             ["git", "-C", repo_dir, "log", "--format=%H", "--", target_dir],
@@ -22,10 +38,38 @@ def get_commits(repo_url, repo_dir, target_dir):
         return commits
 
     except subprocess.CalledProcessError as error:
-        print(f"Ошибка при клонировании или получении коммитов: {error}")
+        print(f"Ошибка при получении коммитов: {error}")
         return []
 
-def get_target_dir(commit, repo_dir, target_dir):
+
+def get_all_commits(repo_dir):
+    try:
+        # Получение списка коммитов
+        commits_output = subprocess.run(
+            ["git", "-C", repo_dir, "log", "--format=%H"],
+            capture_output=True, text=True, check=True
+        )
+
+        # Проверка вывода коммитов
+        commits = commits_output.stdout.strip().split("\n") if commits_output.stdout.strip() else []
+
+        return commits
+
+    except subprocess.CalledProcessError as error:
+        print(f"Ошибка при получении коммитов: {error}")
+        return []
+
+
+def get_next_commit(all_commits, commit):
+    if commit in all_commits:
+        index = all_commits.index(commit)
+        # Возвращаем следующий коммит
+        return all_commits[index + 1] if index + 1 < len(all_commits) else None
+
+    return None  # Если коммит не найден
+
+
+def get_target_dir(repo_dir, target_dir):
     """Функция загрузки целевой директории"""
     try:
         """Инициализация sparse-checkout в склонированном репозитории"""
@@ -38,13 +82,21 @@ def get_target_dir(commit, repo_dir, target_dir):
             ["git", "-C", repo_dir, "sparse-checkout", "set", "--no-cone", target_dir],
             check=True, stderr=subprocess.DEVNULL
         )
-        """Загрузка целевой директории по хэшу коммита"""
+
+    except subprocess.CalledProcessError as error:
+        print(f"Ошибка при выполнении команды sparse-checkout: {error}")
+
+
+def change_commit(commit, repo_dir):
+    """Переключение целевой директории на заданный коммит"""
+    try:
         subprocess.run(
             ["git", "-C", repo_dir, "checkout", commit],
             check=True, stderr=subprocess.DEVNULL
         )
     except subprocess.CalledProcessError as error:
-        print(f"Ошибка при выполнении команды sparse-checkout или checkout: {error}")
+        print(f"Ошибка при выполнении команды checkout: {error}")
+
 
 def get_commit_tags(repo_dir, commit):
     """Функция получения тегов для определенного коммита"""

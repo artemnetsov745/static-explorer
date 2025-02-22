@@ -1,12 +1,23 @@
+import csv
+import json
 import re
 import subprocess
 
 
 def RemoveSpecSymbols(content):
-    # Преобразование шаблона для поиска '\r' к типу bytes
+    '''
+    Removing special characters (now only '\r').
+
+    :param content: Content from which special characters should be removed
+    :return: Content without special characters.
+    '''
+
+    # Converting the '\r' search template to bytes type
     pattern_bytes = r'\r'.encode('utf-8')
-    # Удаление символа '\r'
+
+    # Removing the '\r' character
     cleaned_content = re.sub(pattern_bytes, b'', content)
+
     return cleaned_content
 
 
@@ -31,7 +42,14 @@ def SaveToCsvFile(commits, tags):
     :param tags: List of tags
     '''
 
-    print('SaveToCsvFile')
+    # Combining lists to record each row separately
+    data = [commits] + [tags]
+
+    with open('output.csv', 'w', newline='') as file:
+        writer = csv.writer(file, delimiter=';')
+        for row in data:
+            writer.writerow(row)
+
 
 def SaveToJsonFile(commits, tags):
     '''
@@ -41,4 +59,10 @@ def SaveToJsonFile(commits, tags):
     :param tags: List of tags
     '''
 
-    print('SaveToJsonFile')
+    data = {
+        "commits": [commits],
+        "tags": [tags]
+    }
+
+    with open('output.json', 'w', encoding='utf-8') as file:
+        json.dump(data, file, ensure_ascii=False, indent=4)

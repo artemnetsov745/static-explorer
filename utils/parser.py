@@ -3,7 +3,7 @@ import argparse
 
 def InitParser():
     parser = argparse.ArgumentParser(description='A console program for determining the versions of web applications based on their static resources')
-    # Обязательный агрумент - the URL of the target site
+    # Required argument - the URL of the target site
     parser.add_argument("url", help="The URL of the target site")
 
     # Required argument - link to the git repository
