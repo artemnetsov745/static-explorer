@@ -1,0 +1,7 @@
+@ECHO OFF
+
+SET THEDIR=%~1
+
+RMDIR /S /Q "%THEDIR%"
+
+EXIT

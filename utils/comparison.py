@@ -1,13 +1,30 @@
 import os
 import hashlib
 
+from utils.filemanager import RemoveSpecSymbols
+
+
+def get_content_hash(file_content, hash_algorithm="sha3_256"):
+    '''
+    The function of calculating the hash of a file by its contents.
+
+    :param file_content: File content
+    :param hash_algorithm: Hash algorithm, by default is sha3_256
+    :return: Hash of the file contents as a hex string.
+    '''
+
+    hash_function = getattr(hashlib, hash_algorithm)()
+    cleaned_file_content = RemoveSpecSymbols(file_content)
+    hash_function.update(cleaned_file_content)
+    return hash_function.hexdigest()
+
 
 def get_file_hash(file_path, hash_algorithm="sha3_256"):
     hash_function = getattr(hashlib, hash_algorithm)()
     with open(file_path, "rb") as file:
         while chunk := file.read(8192):
-            hash_function.update(chunk)
-    
+            hash_function.update(RemoveSpecSymbols(chunk))
+
     return hash_function.hexdigest()
 
 
