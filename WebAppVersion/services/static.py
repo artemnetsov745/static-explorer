@@ -9,7 +9,7 @@ from urllib.parse import urlparse, urljoin
 import requests
 from bs4 import BeautifulSoup
 
-from .exceptions import FailedToDownloadFileException
+from WebAppVersion.exceptions.static import FailedToDownloadFileException
 
 
 @dataclasses.dataclass
