@@ -1,6 +1,6 @@
 from threading import Thread
 
-from services.static import StaticFilesTraversalService
+from .services.static import StaticFilesTraversalService
 from .utils.comparison import get_dir_hashes, get_content_hash, compare_hashes
 from .utils.filemanager import ClearData, SaveToCsvFile, SaveToJsonFile
 from .utils.git_functions import get_commits, get_all_tags, get_target_dir, clone_repository, change_commit, \
