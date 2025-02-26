@@ -1,1 +1,1 @@
-from services.static import StaticFilesTraversalService
+from .services.static import StaticFilesTraversalService
